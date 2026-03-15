@@ -1,61 +1,67 @@
-# Base de datos SQLite para la tienda
-
 import sqlite3
+import hashlib
 import os
-from models import Producto
+import sys
 
-DB_FILE = "tienda.db"
+# Ruta de la BD junto al ejecutable (cuando es .exe) o junto al script
+if getattr(sys, "frozen", False):
+    _BASE = os.path.dirname(sys.executable)
+else:
+    _BASE = os.path.dirname(os.path.abspath(__file__))
+
+DB_FILE = os.path.join(_BASE, "galapro.db")
 
 
 def conectar():
-    """Crea conexión a la base de datos"""
-    conexion = sqlite3.connect(DB_FILE)
-    conexion.row_factory = sqlite3.Row
-    return conexion
+    conn = sqlite3.connect(DB_FILE, timeout=10)
+    conn.row_factory = sqlite3.Row
+    conn.execute("PRAGMA foreign_keys = ON")
+    conn.execute("PRAGMA journal_mode=WAL")
+    return conn
 
 
-def crear_tabla():
-    """Crea la tabla de productos si no existe"""
-    conexion = conectar()
-    cursor = conexion.cursor()
-    
-    cursor.execute('''
-        CREATE TABLE IF NOT EXISTS productos (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            nombre TEXT NOT NULL,
-            categoria TEXT NOT NULL,
-            precio REAL NOT NULL,
-            cantidad INTEGER NOT NULL
+def crear_tablas():
+    conn = conectar()
+    cur = conn.cursor()
+
+    cur.execute("""
+        CREATE TABLE IF NOT EXISTS usuarios (
+            id            INTEGER PRIMARY KEY AUTOINCREMENT,
+            usuario       TEXT    NOT NULL UNIQUE,
+            password_hash TEXT    NOT NULL
         )
-    ''')
-    
-    conexion.commit()
-    conexion.close()
+    """)
 
+    cur.execute("""
+        CREATE TABLE IF NOT EXISTS clientes (
+            id             INTEGER PRIMARY KEY AUTOINCREMENT,
+            codigo         TEXT    NOT NULL UNIQUE,
+            nombre         TEXT    NOT NULL,
+            telefono       TEXT,
+            fecha_registro TEXT    NOT NULL
+        )
+    """)
 
-def inicializar_db():
-    """Inicializa la base de datos con algunos productos de ejemplo"""
-    if not os.path.exists(DB_FILE):
-        crear_tabla()
-        conexion = conectar()
-        cursor = conexion.cursor()
-        
-        # Datos de ejemplo
-        productos_ejemplo = [
-            ("Laptop", "Electrónica", 799.99, 5),
-            ("Mouse", "Electrónica", 25.99, 20),
-            ("Camiseta", "Ropa", 19.99, 15),
-            ("Pantalones", "Ropa", 49.99, 10),
-            ("Arroz", "Alimentos", 3.50, 50),
-            ("Python 101", "Libros", 29.99, 8),
-            ("Almohada", "Hogar", 15.99, 12),
-        ]
-        
-        for nombre, categoria, precio, cantidad in productos_ejemplo:
-            cursor.execute('''
-                INSERT INTO productos (nombre, categoria, precio, cantidad)
-                VALUES (?, ?, ?, ?)
-            ''', (nombre, categoria, precio, cantidad))
-        
-        conexion.commit()
-        conexion.close()
+    cur.execute("""
+        CREATE TABLE IF NOT EXISTS eventos (
+            id           INTEGER PRIMARY KEY AUTOINCREMENT,
+            nombre_tipo  TEXT    NOT NULL,
+            descripcion  TEXT,
+            estatus      TEXT    NOT NULL DEFAULT 'Cotizado',
+            fecha_evento TEXT    NOT NULL,
+            cliente_id   INTEGER NOT NULL,
+            FOREIGN KEY (cliente_id) REFERENCES clientes(id) ON DELETE CASCADE
+        )
+    """)
+
+    # Usuario admin por defecto si no hay ninguno
+    cur.execute("SELECT COUNT(*) FROM usuarios")
+    if cur.fetchone()[0] == 0:
+        h = hashlib.sha256("admin123".encode()).hexdigest()
+        cur.execute(
+            "INSERT INTO usuarios (usuario, password_hash) VALUES (?, ?)",
+            ("admin", h)
+        )
+
+    conn.commit()
+    conn.close()

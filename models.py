@@ -1,19 +1,22 @@
-# Modelos de datos para la tienda
-
-class Producto:
-    """Modelo para productos de la tienda"""
-    def __init__(self, id=None, nombre="", categoria="", precio=0.0, cantidad=0):
+class Cliente:
+    def __init__(self, id=None, codigo="", nombre="", telefono="", fecha_registro=""):
         self.id = id
+        self.codigo = codigo
         self.nombre = nombre
-        self.categoria = categoria
-        self.precio = precio
-        self.cantidad = cantidad
-    
-    def __str__(self):
-        return f"ID: {self.id} | {self.nombre} | Categoría: {self.categoria} | Precio: ${self.precio:.2f} | Stock: {self.cantidad}"
-    
-    def __repr__(self):
-        return self.__str__()
+        self.telefono = telefono
+        self.fecha_registro = fecha_registro
 
 
-CATEGORIAS = ["Electrónica", "Ropa", "Alimentos", "Libros", "Hogar"]
+class Evento:
+    def __init__(self, id=None, nombre_tipo="", descripcion="", estatus="Cotizado",
+                 fecha_evento="", cliente_id=None, cliente_nombre=""):
+        self.id = id
+        self.nombre_tipo = nombre_tipo
+        self.descripcion = descripcion
+        self.estatus = estatus
+        self.fecha_evento = fecha_evento
+        self.cliente_id = cliente_id
+        self.cliente_nombre = cliente_nombre
+
+
+ESTATUSES = ["Cotizado", "Confirmado", "Realizado", "Cancelado"]

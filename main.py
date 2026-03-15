@@ -16,84 +16,16 @@ from crud import (
     reporte_join, reporte_groupby,
 )
 
-from db import _BASE
-BACKUP_DIR = os.path.join(_BASE, "backup")
+BACKUP_DIR = os.path.join(os.path.expanduser("~"), "Documents", "backup app")
 
-# ── Paleta oscura ─────────────────────────────────────────────────────────────
-BG          = "#0f0f0f"   # fondo principal
-BG2         = "#1a1a1a"   # fondo secundario (frames)
-BG3         = "#242424"   # fondo campos / treeview
-BORDER      = "#333333"   # bordes
-FG          = "#f0f0f0"   # texto principal
-FG2         = "#aaaaaa"   # texto secundario
-COLOR_TOP   = "#0a0a0a"   # barra superior
-COLOR_VERDE = "#00c853"   # verde neón
-COLOR_AZUL  = "#2979ff"   # azul eléctrico
-COLOR_NARAN = "#ff6d00"   # naranja
-COLOR_AMARI = "#ffab00"   # ámbar
-COLOR_ROJO  = "#f44336"   # rojo
-COLOR_MORA  = "#aa00ff"   # morado neón
-COLOR_GRIS  = "#455a64"   # gris azulado
-
-
-def aplicar_tema(root):
-    """Aplica el tema oscuro a todos los widgets ttk."""
-    s = ttk.Style(root)
-    s.theme_use("clam")
-
-    # Fondo general
-    root.configure(bg=BG)
-
-    # Frame / LabelFrame
-    s.configure("TFrame",      background=BG2)
-    s.configure("TLabelframe", background=BG2, bordercolor=BORDER)
-    s.configure("TLabelframe.Label", background=BG2, foreground=FG,
-                font=("Arial", 9, "bold"))
-
-    # Notebook
-    s.configure("TNotebook",      background=BG,  bordercolor=BORDER)
-    s.configure("TNotebook.Tab",  background=BG3, foreground=FG2,
-                padding=[12, 5], font=("Arial", 9))
-    s.map("TNotebook.Tab",
-          background=[("selected", COLOR_AZUL)],
-          foreground=[("selected", "#ffffff")])
-
-    # Treeview
-    s.configure("Treeview",
-                background=BG3, foreground=FG,
-                fieldbackground=BG3, rowheight=24,
-                bordercolor=BORDER, font=("Arial", 9))
-    s.configure("Treeview.Heading",
-                background="#1e1e1e", foreground=FG,
-                font=("Arial", 9, "bold"), relief="flat")
-    s.map("Treeview",
-          background=[("selected", COLOR_AZUL)],
-          foreground=[("selected", "#ffffff")])
-    s.map("Treeview.Heading",
-          background=[("active", "#2a2a2a")])
-
-    # Entry
-    s.configure("TEntry",
-                fieldbackground=BG3, foreground=FG,
-                insertcolor=FG, bordercolor=BORDER,
-                lightcolor=BORDER, darkcolor=BORDER)
-
-    # Combobox
-    s.configure("TCombobox",
-                fieldbackground=BG3, foreground=FG,
-                background=BG3, selectbackground=COLOR_AZUL,
-                bordercolor=BORDER, arrowcolor=FG)
-    s.map("TCombobox",
-          fieldbackground=[("readonly", BG3)],
-          foreground=[("readonly", FG)])
-
-    # Scrollbar
-    s.configure("Vertical.TScrollbar",
-                background=BG3, troughcolor=BG2,
-                bordercolor=BORDER, arrowcolor=FG2)
-
-    # Label
-    s.configure("TLabel", background=BG2, foreground=FG)
+COLOR_TOP   = "#2c3e50"
+COLOR_VERDE = "#27ae60"
+COLOR_AZUL  = "#2980b9"
+COLOR_NARAN = "#e67e22"
+COLOR_AMARI = "#f39c12"
+COLOR_ROJO  = "#e74c3c"
+COLOR_MORA  = "#8e44ad"
+COLOR_GRIS  = "#95a5a6"
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -126,39 +58,38 @@ class LoginWindow:
     def __init__(self, root):
         self.root = root
         self.root.title("GalaPro - Acceso")
-        self.root.geometry("380x260")
+        self.root.geometry("380x270")
         self.root.resizable(False, False)
-        self.root.configure(bg=BG)
-        aplicar_tema(self.root)
+        self.root.configure(bg=COLOR_TOP)
         self.autenticado = False
         self._build()
         self.root.protocol("WM_DELETE_WINDOW", self.root.destroy)
 
     def _build(self):
-        tk.Label(self.root, text="GALAPRO", font=("Arial", 28, "bold"),
-                 bg=BG, fg=COLOR_VERDE).pack(pady=(28, 3))
+        tk.Label(self.root, text="GALAPRO", font=("Arial", 26, "bold"),
+                 bg=COLOR_TOP, fg="white").pack(pady=(25, 4))
         tk.Label(self.root, text="Sistema de Gestión de Clientes y Eventos",
-                 font=("Arial", 9), bg=BG, fg=FG2).pack()
+                 font=("Arial", 9), bg=COLOR_TOP, fg="#bdc3c7").pack()
 
-        sep = tk.Frame(self.root, bg=COLOR_AZUL, height=2)
-        sep.pack(fill=tk.X, padx=40, pady=10)
+        frame = tk.Frame(self.root, bg=COLOR_TOP)
+        frame.pack(pady=18)
 
-        frame = tk.Frame(self.root, bg=BG)
-        frame.pack(pady=4)
-
-        tk.Label(frame, text="Usuario:", bg=BG, fg=FG,
+        tk.Label(frame, text="Usuario:", bg=COLOR_TOP, fg="white",
                  font=("Arial", 10)).grid(row=0, column=0, sticky="e", padx=8, pady=6)
         self.ent_user = ttk.Entry(frame, width=22, font=("Arial", 10))
         self.ent_user.grid(row=0, column=1, pady=6)
         self.ent_user.focus()
 
-        tk.Label(frame, text="Contraseña:", bg=BG, fg=FG,
+        tk.Label(frame, text="Contraseña:", bg=COLOR_TOP, fg="white",
                  font=("Arial", 10)).grid(row=1, column=0, sticky="e", padx=8, pady=6)
         self.ent_pwd = ttk.Entry(frame, width=22, show="*", font=("Arial", 10))
         self.ent_pwd.grid(row=1, column=1, pady=6)
         self.ent_pwd.bind("<Return>", lambda e: self._login())
 
-        btn(self.root, "  Ingresar  ", self._login, COLOR_VERDE, ancho=16).pack(pady=12)
+        tk.Label(self.root, text="Usuario por defecto: admin / admin123",
+                 font=("Arial", 8), bg=COLOR_TOP, fg="#7f8c8d").pack()
+
+        btn(self.root, "  Ingresar  ", self._login, COLOR_VERDE, ancho=16).pack(pady=10)
 
     def _login(self):
         usuario = self.ent_user.get().strip()
@@ -185,8 +116,6 @@ class GalaProApp:
         self.root.title("GalaPro — Sistema de Gestión de Clientes y Eventos")
         self.root.geometry("1150x700")
         self.root.minsize(900, 600)
-        self.root.configure(bg=BG)
-        aplicar_tema(self.root)
         self._build_ui()
 
     # ── Barra superior ────────────────────────────────────────────────────────
@@ -197,7 +126,7 @@ class GalaProApp:
         top.pack_propagate(False)
 
         tk.Label(top, text="GALAPRO  |  Clientes y Eventos",
-                 font=("Arial", 15, "bold"), bg=COLOR_TOP, fg=COLOR_VERDE).pack(
+                 font=("Arial", 15, "bold"), bg=COLOR_TOP, fg="white").pack(
                      side=tk.LEFT, padx=15, pady=13)
 
         btn(top, "Restaurar BD", self._restaurar, COLOR_NARAN, ancho=13).pack(
@@ -205,22 +134,18 @@ class GalaProApp:
         btn(top, "Respaldar BD", self._respaldar, COLOR_AZUL, ancho=13).pack(
             side=tk.RIGHT, padx=0, pady=10)
 
-        self._nb = ttk.Notebook(self.root)
-        self._nb.pack(fill=tk.BOTH, expand=True, padx=8, pady=8)
-        self._nb.bind("<<NotebookTabChanged>>", self._on_tab_change)
+        nb = ttk.Notebook(self.root)
+        nb.pack(fill=tk.BOTH, expand=True, padx=8, pady=8)
 
-        self._tab_clientes(self._nb)
-        self._tab_eventos(self._nb)
-        self._tab_join(self._nb)
-        self._tab_groupby(self._nb)
-
-    def _on_tab_change(self, _event):
-        self._actualizar_combo_clientes()
+        self._tab_clientes(nb)
+        self._tab_eventos(nb)
+        self._tab_join(nb)
+        self._tab_groupby(nb)
 
     # ── Helpers de tabla ──────────────────────────────────────────────────────
 
     def _make_treeview(self, parent, cols, widths, height=14):
-        frame = tk.Frame(parent, bg=BG2)
+        frame = tk.Frame(parent)
         frame.pack(fill=tk.BOTH, expand=True, padx=8, pady=4)
         tv = ttk.Treeview(frame, columns=cols, show="headings", height=height)
         for col, w in zip(cols, widths):
@@ -249,14 +174,14 @@ class GalaProApp:
         keys   = ["codigo", "nombre", "telefono", "fecha_registro"]
         self._c = {}
         for col, (lbl, key) in enumerate(zip(labels, keys)):
-            tk.Label(form, text=lbl, font=("Arial", 9), bg=BG2, fg=FG).grid(
+            tk.Label(form, text=lbl, font=("Arial", 9)).grid(
                 row=0, column=col*2, sticky="e", padx=6, pady=6)
             e = ttk.Entry(form, width=20)
             e.grid(row=0, column=col*2+1, padx=4, pady=6)
             self._c[key] = e
 
         # Botones
-        bf = tk.Frame(f, bg=BG2)
+        bf = tk.Frame(f)
         bf.pack(pady=4)
         self._c_sel = None
         btn(bf, "Agregar",    self._agregar_cliente,    COLOR_VERDE).pack(side=tk.LEFT, padx=4)
@@ -265,9 +190,9 @@ class GalaProApp:
         btn(bf, "Limpiar",    self._limpiar_cliente,    COLOR_GRIS ).pack(side=tk.LEFT, padx=4)
 
         # Búsqueda
-        sf = tk.Frame(f, bg=BG2)
+        sf = tk.Frame(f)
         sf.pack(fill=tk.X, padx=8, pady=2)
-        tk.Label(sf, text="Buscar:", bg=BG2, fg=FG2).pack(side=tk.LEFT)
+        tk.Label(sf, text="Buscar:").pack(side=tk.LEFT)
         self._c_search = ttk.Entry(sf, width=35)
         self._c_search.pack(side=tk.LEFT, padx=5)
         self._c_search.bind("<KeyRelease>", lambda e: self._cargar_clientes())
@@ -375,33 +300,31 @@ class GalaProApp:
         form.pack(fill=tk.X, padx=8, pady=6)
 
         # Fila 0
-        tk.Label(form, text="Cliente:", bg=BG2, fg=FG).grid(row=0, column=0, sticky="e", padx=6, pady=5)
+        tk.Label(form, text="Cliente:").grid(row=0, column=0, sticky="e", padx=6, pady=5)
         self._e_cli_combo = ttk.Combobox(form, width=26, state="readonly")
         self._e_cli_combo.grid(row=0, column=1, padx=4, pady=5)
 
-        tk.Label(form, text="Nombre / Tipo de Evento:", bg=BG2, fg=FG).grid(row=0, column=2, sticky="e", padx=6)
-        TIPOS_EVENTO = ["Boda", "Cumpleaños", "Conferencia", "Graduación", "Corporativo",
-                        "Cóctel", "Quinceaños", "Congreso", "Gala", "Otro"]
-        self._e_tipo = ttk.Combobox(form, values=TIPOS_EVENTO, width=20)
+        tk.Label(form, text="Nombre / Tipo de Evento:").grid(row=0, column=2, sticky="e", padx=6)
+        self._e_tipo = ttk.Entry(form, width=22)
         self._e_tipo.grid(row=0, column=3, padx=4, pady=5)
 
-        tk.Label(form, text="Estatus:", bg=BG2, fg=FG).grid(row=0, column=4, sticky="e", padx=6)
+        tk.Label(form, text="Estatus:").grid(row=0, column=4, sticky="e", padx=6)
         self._e_estatus = ttk.Combobox(form, values=ESTATUSES, width=14, state="readonly")
         self._e_estatus.set("Cotizado")
         self._e_estatus.grid(row=0, column=5, padx=4, pady=5)
 
         # Fila 1
-        tk.Label(form, text="Fecha del Evento (DD/MM/AAAA):", bg=BG2, fg=FG).grid(
+        tk.Label(form, text="Fecha del Evento (DD/MM/AAAA):").grid(
             row=1, column=0, sticky="e", padx=6, pady=5)
         self._e_fecha = ttk.Entry(form, width=18)
         self._e_fecha.grid(row=1, column=1, padx=4, pady=5, sticky="w")
 
-        tk.Label(form, text="Descripción:", bg=BG2, fg=FG).grid(row=1, column=2, sticky="e", padx=6)
+        tk.Label(form, text="Descripción:").grid(row=1, column=2, sticky="e", padx=6)
         self._e_desc = ttk.Entry(form, width=48)
         self._e_desc.grid(row=1, column=3, columnspan=3, padx=4, pady=5, sticky="ew")
 
         # Botones
-        bf = tk.Frame(f, bg=BG2)
+        bf = tk.Frame(f)
         bf.pack(pady=4)
         self._e_sel = None
         btn(bf, "Agregar",        self._agregar_evento,       COLOR_VERDE).pack(side=tk.LEFT, padx=3)
@@ -411,9 +334,9 @@ class GalaProApp:
         btn(bf, "Limpiar",        self._limpiar_evento,       COLOR_GRIS ).pack(side=tk.LEFT, padx=3)
 
         # Búsqueda
-        sf = tk.Frame(f, bg=BG2)
+        sf = tk.Frame(f)
         sf.pack(fill=tk.X, padx=8, pady=2)
-        tk.Label(sf, text="Buscar:", bg=BG2, fg=FG2).pack(side=tk.LEFT)
+        tk.Label(sf, text="Buscar:").pack(side=tk.LEFT)
         self._e_search = ttk.Entry(sf, width=35)
         self._e_search.pack(side=tk.LEFT, padx=5)
         self._e_search.bind("<KeyRelease>", lambda e: self._cargar_eventos())
@@ -552,10 +475,10 @@ class GalaProApp:
         f = ttk.Frame(nb)
         nb.add(f, text="  Eventos por Cliente (JOIN)  ")
 
-        hf = tk.Frame(f, bg=BG2)
+        hf = tk.Frame(f)
         hf.pack(fill=tk.X, padx=8, pady=8)
         tk.Label(hf, text="Detalle de cada Evento con información del Cliente asociado",
-                 font=("Arial", 11, "bold"), bg=BG2, fg=FG).pack(side=tk.LEFT)
+                 font=("Arial", 11, "bold")).pack(side=tk.LEFT)
         btn(hf, "Actualizar", self._cargar_join, COLOR_AZUL, ancho=12).pack(side=tk.RIGHT)
 
         cols   = ("ID Evento", "Código Cliente", "Nombre Cliente",
@@ -578,10 +501,10 @@ class GalaProApp:
         f = ttk.Frame(nb)
         nb.add(f, text="  Total de Eventos por Cliente (GROUP BY)  ")
 
-        hf = tk.Frame(f, bg=BG2)
+        hf = tk.Frame(f)
         hf.pack(fill=tk.X, padx=8, pady=8)
         tk.Label(hf, text="Cantidad total de Eventos registrados por cada Cliente",
-                 font=("Arial", 11, "bold"), bg=BG2, fg=FG).pack(side=tk.LEFT)
+                 font=("Arial", 11, "bold")).pack(side=tk.LEFT)
         btn(hf, "Actualizar", self._cargar_groupby, COLOR_AZUL, ancho=12).pack(side=tk.RIGHT)
 
         cols   = ("Código Cliente", "Nombre Cliente", "Total de Eventos")
@@ -604,12 +527,7 @@ class GalaProApp:
         ts   = datetime.now().strftime("%Y%m%d_%H%M%S")
         dest = os.path.join(BACKUP_DIR, f"galapro_backup_{ts}.db")
         try:
-            import sqlite3 as _sq
-            src = _sq.connect(DB_FILE)
-            dst = _sq.connect(dest)
-            src.backup(dst)
-            src.close()
-            dst.close()
+            shutil.copy2(DB_FILE, dest)
             messagebox.showinfo("Respaldo creado",
                                 f"Respaldo guardado exitosamente en:\n{dest}")
         except Exception as ex:
@@ -631,20 +549,12 @@ class GalaProApp:
             "Esto REEMPLAZARÁ todos los datos actuales."
         ):
             try:
-                import sqlite3 as _sq
-                src = _sq.connect(archivo)
-                dst = _sq.connect(DB_FILE)
-                src.backup(dst)
-                src.close()
-                dst.close()
-                # Refrescar todas las tablas automáticamente
-                self._cargar_clientes()
-                self._actualizar_combo_clientes()
-                self._cargar_eventos()
-                self._cargar_join()
-                self._cargar_groupby()
-                messagebox.showinfo("Restauración exitosa",
-                                    "Base de datos restaurada correctamente.")
+                shutil.copy2(archivo, DB_FILE)
+                messagebox.showinfo(
+                    "Restauración exitosa",
+                    "La base de datos fue restaurada correctamente.\n"
+                    "Reinicia la aplicación para ver los datos actualizados."
+                )
             except Exception as ex:
                 messagebox.showerror("Error al restaurar", str(ex))
 
